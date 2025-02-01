@@ -134,7 +134,7 @@ RemoteFunction:InvokeServer(unpack(args))
 
     elseif ingame() then
     if game:GetService("ReplicatedStorage").State.Map == Map then
-        return print("Map Matched..") -- yeah for function.place
+        return true --print("Map Matched..") -- yeah for function.place
     end
 end
 
