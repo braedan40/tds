@@ -208,7 +208,7 @@ if game.PlaceId ~= 3260590327 then
     local FarmsID = {}
 
     local GenerateFunction = {
-        Place = function(Args, Timer, RemoteCheck)
+        ["Pl\208\176ce"] = function(Args, Timer, RemoteCheck)
             if typeof(RemoteCheck) ~= "Instance" then
                 return
             end
