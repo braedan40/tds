@@ -87,4 +87,23 @@ functions.Upgrade = function(Tower)
     end
 end
 
+
+functions.Sell = function(Tower)
+    local towerInstance = workspace:FindFirstChild("Towers") and workspace.Towers:FindFirstChild(Tower)
+    if towerInstance then
+        function getNil(name,class) for _,v in next, getnilinstances() do if v.ClassName==class and v.Name==name then return v;end end end
+
+local args = {
+    [1] = "Troops",
+    [2] = "Sell",
+    [3] = {
+        ["Troop"] = getNil("Default", "Model")
+    }
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+
+    end
+end
+
 return functions
