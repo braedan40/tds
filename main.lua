@@ -50,9 +50,26 @@ functions.Place = function(Tower)
     end
 end
 
-functions.Upgrade = function(Tower,wave,Timer)
+functions.Select = function(Tower)
+local towerInstance = workspace:FindFirstChild("Towers") and workspace.Towers:FindFirstChild(Tower)
+
+if towerInstance then
+
+local args = {
+    [1] = "Streaming",
+    [2] = "SelectTower", 
+    [3] = "Set", -- name of tower
+    [4] = { } -- name of skiin
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+ end
+end
+
+
+functions.Upgrade = function(Tower)
     local towerInstance = workspace:FindFirstChild("Towers") and workspace.Towers:FindFirstChild(Tower)
-    repeat task.wait() until waitwavetimer(wave,timer)
+    
     if towerInstance then
         local args = {
             [1] = "Troops",
