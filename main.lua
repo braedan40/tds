@@ -244,5 +244,14 @@ local args = {
 game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
     end
 end
+functions.Skip = function(wave,Timer)
+            repeat task.wait() until waitwavetimer(wave,Timer)
+        local args = {
+    [1] = "Voting",
+    [2] = "Skip"
+}
 
+game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+
+        end
 return functions
