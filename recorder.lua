@@ -212,14 +212,14 @@ if game.PlaceId ~= 3260590327 then
             if typeof(RemoteCheck) ~= "Instance" then
                 return
             end
-            local TowerName = Args[5]
+            local TowerName = Args[3]
             local Position = Args[4].Position
             local Rotation = Args[4].Rotation
             local RotateX,RotateY,RotateZ = Rotation:ToEulerAnglesYXZ()
             TowerCount += 1
             RemoteCheck.Name = TowerCount
             TowersList[TowerCount] = {
-                ["TowerName"] = Args[5],
+                ["TowerName"] = Args[3],
                 ["Instance"] = RemoteCheck,
                 ["Position"] = Position,
                 ["Rotation"] = Rotation,
