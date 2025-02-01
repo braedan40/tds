@@ -50,9 +50,9 @@ functions.Place = function(Tower)
     end
 end
 
-functions.Upgrade = function(Tower)
+functions.Upgrade = function(Tower,wave,Timer)
     local towerInstance = workspace:FindFirstChild("Towers") and workspace.Towers:FindFirstChild(Tower)
-    
+    repeat task.wait() until waitwavetimer(wave,timer)
     if towerInstance then
         local args = {
             [1] = "Troops",
