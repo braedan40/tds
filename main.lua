@@ -108,17 +108,17 @@ game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"):InvokeServer
 end
 
 
-functions.Skill = function(Tower)
+functions.Skill = function(Tower,wave,Timer,Abilityname)
     local towerInstance = workspace:FindFirstChild("Towers") and workspace.Towers:FindFirstChild(Tower)
     if towerInstance then
-    
+    repeat task.wait() until waitwavetimer(wave, Timer)
 local args = {
     [1] = "Troops",
     [2] = "Abilities",
     [3] = "Activate",
     [4] = {
-        ["Troop"] = workspace:WaitForChild("Towers"):WaitForChild("Commander"),
-        ["Name"] = "Call Of Arms",
+        ["Troop"] = Tower,
+        ["Name"] = AbilityName,
         ["Data"] = {}
     }
 }
