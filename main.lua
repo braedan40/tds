@@ -104,7 +104,26 @@ local args = {
 }
 
 game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+    end
+end
 
+
+functions.Skill = function(Tower)
+    local towerInstance = workspace:FindFirstChild("Towers") and workspace.Towers:FindFirstChild(Tower)
+    if towerInstance then
+    
+local args = {
+    [1] = "Troops",
+    [2] = "Abilities",
+    [3] = "Activate",
+    [4] = {
+        ["Troop"] = workspace:WaitForChild("Towers"):WaitForChild("Commander"),
+        ["Name"] = "Call Of Arms",
+        ["Data"] = {}
+    }
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
     end
 end
 
