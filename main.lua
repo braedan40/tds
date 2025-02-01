@@ -7,10 +7,13 @@ end
 function ingame()
     return game.PlaceId == 3260590327 or game:GetService("Workspace"):FindFirstChild("Type") and game:GetService("Workspace").Type.Value == "Game"
 end
-
 function waitwavetimer(wave, Timer)
     if ingame() then
-        return game:GetService("ReplicatedStorage").State.Timer.Time
+        local gameState = require(game:GetService("ReplicatedStorage").Resources.Universal.GameState)
+        local timer = game:GetService("ReplicatedStorage").State.Timer.Time.Value
+        local wave = GameState["Wave"]
+        if wave > wave and timer < Timer then
+            return true
     end
 end
 
@@ -18,20 +21,20 @@ functions.Map = function(MapName)
     -- Implement this function
 end
 
-functions.Place = function(Tower)
+functions.Place = function(Tower,wave,Timer)
     if ingame() then
         local tabletower = tableinfo[Tower]
         if not tabletower then
             warn("Tower data not found!")
             return
         end
-
+        repeat task.wait() until waitwavetimer(wave,Timer)
         local position = tabletower.Position or CFrame.new(0, 0, 0)
         local rotation = tabletower.Rotation or Vector3.new(0, 0, 0)
-
+ 
         local place
         repeat
-            local args = {
+            place = args = {
                 [1] = "Troops",
                 [2] = "Place",
                 [3] = {
@@ -50,7 +53,7 @@ functions.Place = function(Tower)
     end
 end
 
-functions.Select = function(Tower)
+--[[functions.Select = function(Tower)
 local towerInstance = workspace:FindFirstChild("Towers") and workspace.Towers:FindFirstChild(Tower)
 
 if towerInstance then
@@ -64,12 +67,12 @@ local args = {
 
 game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
  end
-end
+end]]
 
 
-functions.Upgrade = function(Tower)
+functions.Upgrade = function(Tower,wave,Timer)
     local towerInstance = workspace:FindFirstChild("Towers") and workspace.Towers:FindFirstChild(Tower)
-    
+    repeat task.wait() until waitwavetimer(wave,Timer)
     if towerInstance then
         local args = {
             [1] = "Troops",
@@ -91,13 +94,12 @@ end
 functions.Sell = function(Tower)
     local towerInstance = workspace:FindFirstChild("Towers") and workspace.Towers:FindFirstChild(Tower)
     if towerInstance then
-        function getNil(name,class) for _,v in next, getnilinstances() do if v.ClassName==class and v.Name==name then return v;end end end
-
+    
 local args = {
     [1] = "Troops",
     [2] = "Sell",
     [3] = {
-        ["Troop"] = getNil("Default", "Model")
+        ["Troop"] = tower
     }
 }
 
