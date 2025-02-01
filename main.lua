@@ -145,10 +145,10 @@ functions.Place = function(Tower,wave,Timer)
             warn("Tower data not found!")
             return
         end
-        repeat task.wait() until waitwavetimer(wave,Timer)
+        
         local position = tabletower.Position or CFrame.new(0, 0, 0)
         local rotation = tabletower.Rotation or Vector3.new(0, 0, 0)
- 
+        repeat task.wait() until waitwavetimer(wave,Timer)
         local place
         repeat
                     
