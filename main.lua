@@ -138,7 +138,7 @@ RemoteFunction:InvokeServer(unpack(args))
     end
 end
 
-functions.Place = function(Tower,wave,Timer)
+functions.Place = function(Tower, wave, Timer)
     if ingame() then
         local tabletower = tableinfo[Tower]
         if not tabletower then
@@ -148,11 +148,14 @@ functions.Place = function(Tower,wave,Timer)
         
         local position = tabletower.Position or CFrame.new(0, 0, 0)
         local rotation = tabletower.Rotation or Vector3.new(0, 0, 0)
-        repeat task.wait() until waitwavetimer(wave,Timer)
+        
+        repeat
+            task.wait()
+        until waitwavetimer(wave, Timer)
+        
         local place
         repeat
-                    
-             local args = {
+            local args = {
                 [1] = "Troops",
                 [2] = "Pl\208\176ce",
                 [3] = {
@@ -161,15 +164,15 @@ functions.Place = function(Tower,wave,Timer)
                 },
                 [4] = "Scout"
             }
-
             place = game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
         until typeof(place) == "Instance"
-
-        place.Name += 1  
+        
+        place.Name += 1 --place.Name .. "1"
     else
         return
     end
 end
+
 
 --[[functions.Select = function(Tower)
 local towerInstance = workspace:FindFirstChild("Towers") and workspace.Towers:FindFirstChild(Tower)
