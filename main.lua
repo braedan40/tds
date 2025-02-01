@@ -155,18 +155,12 @@ functions.Place = function(Tower, wave, Timer)
         
         local place
         repeat
-            local args = {
-                [1] = "Troops",
-                [2] = "Pl\208\176ce",
-                [3] = {
-                    ["Rotation"] = rotation,
-                    ["Position"] = position
-                },
-                [4] = "Scout"
-            }
-            place = game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+           
+            place = game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"):InvokeServer("Troops","Pl\208\176ce",{
+                ["Position"] = TowerTable.Position,
+                ["Rotation"] = TowerTable.Rotation
+            },Tower)
         until typeof(place) == "Instance"
-        
         place.Name += 1 --place.Name .. "1"
     else
         return
