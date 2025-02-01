@@ -17,7 +17,7 @@ function waitwavetimer(wave, Timer)
     end
 end
 
-functions.Map = function(MapName)
+functions.Map = function(MapName,bool,Type)
    if inlobby() then
 
 
