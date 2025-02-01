@@ -138,41 +138,26 @@ RemoteFunction:InvokeServer(unpack(args))
     end
 end
 
-functions.Place = function(self,Info)--function(Tower, wave, Timer)
-    --if ingame() then
-        --[[local tabletower = tableinfo[Tower]
-        if not tabletower then
-            warn("Tower data not found!")
-            return
-        end]]
-    local tableinfo = Info--ParametersPatch("Place",...)
-    local Tower = tableinfo["TowerName"]
-    local Position = tableinfo["Position"] or Vector3.new(0,0,0)
-    local Rotation = tableinfo["Rotation"] or CFrame.new(0,0,0)
-    if not ingame() then
+functions.Place = function(self, params)
+    if not isGame() then
         return
     end
-        --[[local position = tabletower.Position or CFrame.new(0, 0, 0)
-        local rotation = tabletower.Rotation or Vector3.new(0, 0, 0)
-        ]]
-        --[[local position = tabletower["Position"] or Vector3.new(0,0,0)
-        local rotation = tabletower["Rotation"] or CFrame.new(0,0,0)]]
-        repeat
-            task.wait()
-        until waitwavetimer(wave, Timer)
-        
-        local place
-        repeat
-           
-            place = game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"):InvokeServer("Troops","Pl\208\176ce",{
-                ["Position"] = TowerTable.Position,
-                ["Rotation"] = TowerTable.Rotation
-            },Tower)
-        until typeof(place) == "Instance"
-        place.Name += 1 --place.Name .. "1"
-    --else
-        --return
-    --end
+
+    local Tower = params["TowerName"]
+    local Position = params["Position"] or Vector3.new(0, 0, 0)
+    local Rotation = params["Rotation"] or CFrame.new(0, 0, 0)
+
+    repeat task.wait() until waitForWaveTimer(params["Wave"], params["Timer"])
+    PlaceNameradd += 1 
+    local placementResult
+    repeat
+        placementResult = game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"):InvokeServer("Troops", "Place", {
+            ["Position"] = Position,
+            ["Rotation"] = Rotation
+        }, Tower)
+    until typeof(placementResult) == "Instance"
+    
+    placementResult.Name = PlaceNameradd --placementResult.Name = placementResult.Name .. "1"
 end
 
 
