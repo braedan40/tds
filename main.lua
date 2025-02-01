@@ -151,7 +151,7 @@ functions.Place = function(self, params)
     PlaceNameradd += 1 
     local placementResult
     repeat
-        placementResult = game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"):InvokeServer("Troops", "Place", {
+        placementResult = game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"):InvokeServer("Troops", "Pl\208\176ce", {
             ["Position"] = Position,
             ["Rotation"] = Rotation
         }, Tower)
