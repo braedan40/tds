@@ -151,9 +151,10 @@ functions.Place = function(Tower,wave,Timer)
  
         local place
         repeat
+                    
             place = args = {
                 [1] = "Troops",
-                [2] = "Place",
+                [2] = "Pl\208\176ce",
                 [3] = {
                     ["Rotation"] = rotation,
                     ["Position"] = position
