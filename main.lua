@@ -149,7 +149,7 @@ functions.Place = function(self,Info)--function(Tower, wave, Timer)
     local Tower = tableinfo["TowerName"]
     local Position = tableinfo["Position"] or Vector3.new(0,0,0)
     local Rotation = tableinfo["Rotation"] or CFrame.new(0,0,0)
-    if not CheckPlace() then
+    if not ingame() then
         return
     end
         --[[local position = tabletower.Position or CFrame.new(0, 0, 0)
