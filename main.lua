@@ -27,15 +27,36 @@ end
 function ingame()
     return game.PlaceId == 3260590327 or game:GetService("Workspace"):FindFirstChild("Type") and game:GetService("Workspace").Type.Value == "Game"
 end
-function waitwavetimer(wave, Timer)
+function TimerWait(Number)
+
+	return (Number - math.floor(Number) - 0.13) + 0.5
+end
+function TotalOfSec(Minute,Second)
+	return (Minute*60) + math.ceil(Second)
+end
+function waitwavetimer(Wave,Min,Sec,InWave)
     if ingame() then
         local gameState = require(game:GetService("ReplicatedStorage").Resources.Universal.GameState)
         local timer = game:GetService("ReplicatedStorage").State.Timer.Time.Value
+        local RSTimer = game:GetService("ReplicatedStorage"):WaitForChild("State"):WaitForChild("Timer"):WaitForChild("Time")
         local wave = GameState["Wave"]
-        if wave > wave and timer < Timer then
-            return true
+        	if RSTimer.Value - TotalSec(Min,Sec) < -1 then
+		return true
+	end
+       -- if wave > wave and timer < Timer then
+            --return true
+        local Timer = 0
+	repeat
+		task.wait()
+		Timer = RSTimer.Value - TotalOfSec(Min,Sec) -
+	until Timer <= 1
+
+
+	game:GetService("RunService").Heartbeat:Wait(TimerWait(Sec))
+	return true
     end
 end
+
 
 functions.Map = function(MapName,bool,Type)
    if inlobby() then
