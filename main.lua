@@ -31,7 +31,7 @@ end
 --------------------------------------------------------------------------------
 -- Dynamically retrieves a key for secure remote function calls
 --------------------------------------------------------------------------------
-local function getDynamicKey()
+--[[local function getDynamicKey()
     local dynamicKey = "DynamicKey_Generated_or_Fetched"
     if not dynamicKey then
         error("Failed to retrieve dynamic key.")
@@ -53,7 +53,7 @@ local function invokeRemote(args)
         warn("RemoteFunction invocation failed: ", result)
     end
     return result
-end
+end]]
 
 --------------------------------------------------------------------------------
 -- Utility functions to detect if we are in lobby or in a game
