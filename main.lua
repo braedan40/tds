@@ -147,11 +147,10 @@ functions.Loadout = function(self, p1)
 local LoadoutProps = self.LoadoutProps
 
 -- Now LoadoutProps is a table:
-LoadoutProps.AllowTeleport = (typeof(LoadoutProps.AllowTeleport) == "boolean") 
     local AllowEquip = tableinfo["AllowEquip"] or false
     local SkipCheck = tableinfo["SkipCheck"] or false
 
-
+    LoadoutProps.AllowTeleport = (typeof(LoadoutProps.AllowTeleport) == "boolean") 
     local TroopsOwned = GetTowersInfo()
 
     -- Cancel any coroutines in LoadoutProps
