@@ -53,7 +53,7 @@ end
 function waitwavetimer(Wave, Min, Sec, InWave)
     if ingame() then
         local RSTimer = game:GetService("ReplicatedStorage"):WaitForChild("State"):WaitForChild("Timer"):WaitForChild("Time")
-        local targetTime = (Min * 60) + math.ceil(Sec
+        local targetTime = (Min * 60) + math.ceil(Sec)  -- Fixed missing parenthesis
 
         -- If time is already below threshold, immediately return
         if (RSTimer.Value - targetTime) < -1 then
@@ -213,3 +213,12 @@ functions.Skip = function(self, params)
 end
 
 return functions
+
+-- Example usage of the functions
+getgenv().StratCreditsAuthor = "Optional"
+local TDS = loadstring(game:HttpGet("https://raw.githubusercontent.com/braedan40/tds/refs/heads/main/maintwo", true))()
+TDS:Map("Simplicity Remaster", true, "Survival")
+TDS:Loadout({"Soldier"})
+TDS:Mode("Easy")
+TDS:Place("Soldier", -18.070785522460938, 1.0000004768371582, -2.4451284408569336, 0, 0, 13.7, false, -0, 0, 0)
+-- Continue with the rest of your TDS commands...
