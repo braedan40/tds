@@ -139,7 +139,7 @@ function GetTowersInfo()
 end
 
 -- Primary loadout function
-local function Loadout(self, p1)
+functions.Loadout(self, p1)
     local tableinfo = p1
     local TotalTowers = tableinfo
     local GoldenTowers = tableinfo["Golden"] or {}
