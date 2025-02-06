@@ -59,7 +59,7 @@ end]]
 -- Utility functions to detect if we are in lobby or in a game
 --------------------------------------------------------------------------------
 function inlobby()
-    return game.PlaceId == 5591597781 
+    return game.PlaceId == 3260590327 
         or (
             game:GetService("Workspace"):FindFirstChild("Type") 
             and game:GetService("Workspace").Type.Value == "Lobby"
@@ -67,7 +67,7 @@ function inlobby()
 end
 
 function ingame()
-    return game.PlaceId == 3260590327 
+    return game.PlaceId == 5591597781 
         or (
             game:GetService("Workspace"):FindFirstChild("Type") 
             and game:GetService("Workspace").Type.Value == "Game"
