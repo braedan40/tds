@@ -258,33 +258,31 @@ functions.Upgrade = function(self,Params)
     local Rotation = params["Rotation"] or CFrame.new(0, 0, 0)
     local Wave,Min,Sec,InWave = params["Wave"] or 0, params["Minute"] or 0, params["Second"] or 0, params["InBetween"] or false
     repeat task.wait() until waitwavetimer(wave,Min,Sec)
-    if towerInstance then
         local args = {
             [1] = "Troops",
             [2] = "Upgrade",
             [3] = "Set",
             [4] = {
-                ["Troop"] = game:GetService("Workspace').Towers.:FindFirstChild(Tower),
+                ["Troop"] = game:GetService("Workspace').Towers:FindFirstChild(Tower),
                 ["Path"] = 1
             }
         }
 
         game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
-    else
-        warn("Tower not found!")
-    end
 end
 
 
-functions.Sell = function(Tower)
-    local towerInstance = workspace:FindFirstChild("Towers") and workspace.Towers:FindFirstChild(Tower)
-    if towerInstance then
-
+functions.Sell = function(Self, params)
+ local Tower = params["TowerName"]
+    local Position = params["Position"] or Vector3.new(0, 0, 0)
+    local Rotation = params["Rotation"] or CFrame.new(0, 0, 0)
+    local Wave,Min,Sec,InWave = params["Wave"] or 0, params["Minute"] or 0, params["Second"] or 0, params["InBetween"] or false
+    repeat task.wait() until waitwavetimer(wave,Min,Sec)
 local args = {
     [1] = "Troops",
     [2] = "Sell",
     [3] = {
-        ["Troop"] = tower
+        ["Troop"] = game:GetService("Workspace").Towers:FindFirstChild(Tower)
     }
 }
 
@@ -293,16 +291,18 @@ game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"):InvokeServer
 end
 
 
-functions.Skill = function(Tower,wave,Timer,Abilityname)
-    local towerInstance = workspace:FindFirstChild("Towers") and workspace.Towers:FindFirstChild(Tower)
-    if towerInstance then
-    repeat task.wait() until waitwavetimer(wave, Timer)
+functions.Skill = function(Self,params)
+ local Tower = params["TowerName"]
+    local Position = params["Position"] or Vector3.new(0, 0, 0)
+    local Rotation = params["Rotation"] or CFrame.new(0, 0, 0)
+    local Wave,Min,Sec,InWave = params["Wave"] or 0, params["Minute"] or 0, params["Second"] or 0, params["InBetween"] or false
+    repeat task.wait() until waitwavetimer(wave,Min,Sec)
 local args = {
     [1] = "Troops",
     [2] = "Abilities",
     [3] = "Activate",
     [4] = {
-        ["Troop"] = Tower,
+        ["Troop"] = game:GetService("Workspace").Towers:FindFirstChild(Tower),
         ["Name"] = AbilityName,
         ["Data"] = {}
     }
@@ -311,8 +311,9 @@ local args = {
 game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
     end
 end
-functions.Skip = function(wave,Timer)
-            repeat task.wait() until waitwavetimer(wave,Timer)
+functions.Skip = function(Self, params)
+    local Wave,Min,Sec,InWave = params["Wave"] or 0, params["Minute"] or 0, params["Second"] or 0, params["InBetween"] or false
+    repeat task.wait() until waitwavetimer(wave,Min,Sec)
         local args = {
     [1] = "Voting",
     [2] = "Skip"
