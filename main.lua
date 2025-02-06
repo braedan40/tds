@@ -180,7 +180,7 @@ repeat
 task.wait()
 until waitForWaveTimer(params["Wave"], params["Timer"])
 
-PlaceNameradd += 1
+PlaceNameradd = (PlaceNameradd or 0) + 1
 
 local placementResult
 repeat
