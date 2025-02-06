@@ -550,8 +550,9 @@ functions.Upgrade = function(self, params)
         }
     }
     game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
-end
 
+end
+end
 --------------------------------------------------------------------------------
 -- Sell function
 --------------------------------------------------------------------------------
