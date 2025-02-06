@@ -1,4 +1,25 @@
 local functions = {} 
+local function getDynamicKey()
+local dynamicKey = "DynamicKey_Generated_or_Fetched"
+if not dynamicKey then
+error("Failed to retrieve dynamic key.")
+end
+
+return dynamicKey
+end
+local function invokeRemote(args)
+local RemoteFunction = game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction")
+local dynamicKey = getDynamicKey()
+table.insert(args, 1, dynamicKey)
+local success, result = pcall(function()
+return RemoteFunction:InvokeServer(unpack(args))
+end)
+if not success then
+warn("RemoteFunction invocation failed: ", result)
+end
+return result
+end
+local functions = functions or {}
 
 function inlobby()
     return game.PlaceId == 5591597781 or game:GetService("Workspace"):FindFirstChild("Type") and game:GetService("Workspace").Type.Value == "Lobby"
@@ -139,25 +160,46 @@ RemoteFunction:InvokeServer(unpack(args))
 end
 
 functions.Place = function(self, params)
-    if not isGame() then
-        return
-    end
+if not isGame then
+warn("isGame function is not defined.")
+return
+end
+if not isGame() then
+return
+end
 
-    local Tower = params["TowerName"]
-    local Position = params["Position"] or Vector3.new(0, 0, 0)
-    local Rotation = params["Rotation"] or CFrame.new(0, 0, 0)
+local Tower = params["TowerName"]
+local Position = params["Position"] or Vector3.new(0, 0, 0)
+local Rotation = params["Rotation"] or CFrame.new(0, 0, 0)
 
-    repeat task.wait() until waitForWaveTimer(params["Wave"], params["Timer"])
-    PlaceNameradd += 1 
-    local placementResult
-    repeat
-        placementResult = game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"):InvokeServer("Troops", "Pl\208\176ce", {
-            ["Position"] = Position,
-            ["Rotation"] = Rotation
-        }, Tower)
-    until typeof(placementResult) == "Instance"
-    
-    placementResult.Name = PlaceNameradd --placementResult.Name = placementResult.Name .. "1"
+if not waitForWaveTimer then
+warn("waitForWaveTimer function is not defined.")
+return
+end
+repeat
+task.wait()
+until waitForWaveTimer(params["Wave"], params["Timer"])
+
+PlaceNameradd += 1
+
+local placementResult
+repeat
+placementResult = invokeRemote({
+"Troops",
+"Pl\208\176ce",
+{
+["Position"] = Position,
+["Rotation"] = Rotation
+},
+Tower
+})
+until typeof(placementResult) == "Instance"
+
+if placementResult then
+placementResult.Name = PlaceNameradd
+else
+warn("Failed to place the tower: ", Tower)
+end
 end
 
 
