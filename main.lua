@@ -143,7 +143,7 @@ functions.Loadout = function(self, p1)
     local tableinfo = p1
     local TotalTowers = tableinfo
     local GoldenTowers = tableinfo["Golden"] or {}
-    local LoadoutProps = self.Loadout
+    local LoadoutProps = self.LoadoutProps
 
     local AllowEquip = tableinfo["AllowEquip"] or false
     local SkipCheck = tableinfo["SkipCheck"] or false
