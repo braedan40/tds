@@ -143,15 +143,14 @@ functions.Loadout = function(self, p1)
     local tableinfo = p1
     local TotalTowers = tableinfo
     local GoldenTowers = tableinfo["Golden"] or {}
-    local LoadoutProps = self.LoadoutProps
+  -- Instead of 'LoadoutProps = self.Loadout', do:
+local LoadoutProps = self.LoadoutProps
 
+-- Now LoadoutProps is a table:
+LoadoutProps.AllowTeleport = (typeof(LoadoutProps.AllowTeleport) == "boolean") 
     local AllowEquip = tableinfo["AllowEquip"] or false
     local SkipCheck = tableinfo["SkipCheck"] or false
 
-    -- Make sure ‘AllowTeleport’ in LoadoutProps is boolean
-    LoadoutProps.AllowTeleport = (
-        typeof(LoadoutProps.AllowTeleport) == "boolean"
-    ) --and LoadoutProps.AllowTeleport or false
 
     local TroopsOwned = GetTowersInfo()
 
