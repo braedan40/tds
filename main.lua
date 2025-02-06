@@ -151,7 +151,7 @@ functions.Loadout = function(self, p1)
     -- Make sure ‘AllowTeleport’ in LoadoutProps is boolean
     LoadoutProps.AllowTeleport = (
         typeof(LoadoutProps.AllowTeleport) == "boolean"
-    ) and LoadoutProps.AllowTeleport or false
+    ) --and LoadoutProps.AllowTeleport or false
 
     local TroopsOwned = GetTowersInfo()
 
