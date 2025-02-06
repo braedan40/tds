@@ -15,6 +15,7 @@ local TweenService = game:GetService("TweenService")
 
 --// UI Core Storage
 UI.Elements = {}
+UI.Drawings = {}
 
 --// Create a new UI Element
 function UI:CreateElement(type, properties)
@@ -27,9 +28,27 @@ function UI:CreateElement(type, properties)
     return element
 end
 
+--// Render Function (Using Drawing API)
+function UI:Render()
+    for _, element in pairs(self.Elements) do
+        if element.Visible then
+            if element.Type == "Tab" then
+                local tab = Drawing.new("Text")
+                tab.Text = element.Properties.Name or "Tab"
+                tab.Position = Vector2.new(100, 50 + (#self.Drawings * 20))
+                tab.Size = 20
+                tab.Color = Color3.new(1, 1, 1)
+                tab.Visible = true
+                table.insert(self.Drawings, tab)
+            end
+        end
+    end
+end
+
 --// Create Tabs
 function UI:CreateTab(name)
     local tab = self:CreateElement("Tab", {Name = name, Active = false})
+    self:Render()
     return tab
 end
 
@@ -37,6 +56,7 @@ end
 function UI:CreateToggle(name, default, callback)
     local toggle = self:CreateElement("Toggle", {Name = name, State = default or false})
     toggle.Callback = callback or function() end
+    self:Render()
     return toggle
 end
 
@@ -44,12 +64,14 @@ end
 function UI:CreateButton(name, callback)
     local button = self:CreateElement("Button", {Name = name})
     button.Callback = callback or function() end
+    self:Render()
     return button
 end
 
 --// Create Labels
 function UI:CreateLabel(text)
     local label = self:CreateElement("Label", {Text = text})
+    self:Render()
     return label
 end
 
@@ -64,6 +86,7 @@ function UI:CreateNotification(text, duration, color, sound)
         Sound = sound or nil
     })
     table.insert(self.Notifications, notification)
+    self:Render()
     return notification
 end
 
