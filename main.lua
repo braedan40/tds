@@ -139,7 +139,7 @@ function GetTowersInfo()
 end
 
 -- Primary loadout function
-functions.Loadout(self, p1)
+functions.Loadout = function(self, p1)
     local tableinfo = p1
     local TotalTowers = tableinfo
     local GoldenTowers = tableinfo["Golden"] or {}
@@ -167,7 +167,7 @@ functions.Loadout(self, p1)
         for _, towerName in ipairs(TotalTowers) do
             if not (TroopsOwned[towerName] and TroopsOwned[towerName].Equipped) then
                 prints("Loadout", towerName, TroopsOwned[towerName] and TroopsOwned[towerName].Equipped)
-                ConsoleInfo('Tower "' .. towerName .. '" did not equip. Rejoining to Lobby.')
+                ConsoleInfo("Tower \"" .. towerName .. "\" did not equip. Rejoining to Lobby.")
                 task.wait(1)
                 TeleportService:Teleport(3260590327, LocalPlayer)
                 return
@@ -251,7 +251,9 @@ functions.Loadout(self, p1)
                 end
             end
         end
-    end
+    end)
+end
+
 --------------------------------------------------------------------------------
 -- Example usage for "Loadout" (commented-out demonstration)
 --------------------------------------------------------------------------------
@@ -432,7 +434,7 @@ functions.Place = function(self, params)
     repeat
         placementResult = game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"):InvokeServer(
             "Troops",
-            "Pl\208\176ce",
+            "Place",
             {
                 ["Position"] = Position,
                 ["Rotation"] = Rotation
@@ -444,12 +446,12 @@ functions.Place = function(self, params)
     -- Rename the placed tower
     placementResult.Name = PlaceNameradd
 
-    --[[ 
+    --[[
     -- Alternate usage example:
     repeat
         placementResult = invokeRemote({
             "Troops",
-            "Pl\208\176ce",
+            "Place",
             {
                 ["Position"] = Position,
                 ["Rotation"] = Rotation
@@ -551,4 +553,4 @@ end
 --------------------------------------------------------------------------------
 -- Return the table containing all functions
 --------------------------------------------------------------------------------
-return functions
+return functions 
