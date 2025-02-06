@@ -403,7 +403,38 @@ functions.Map = function(MapName, bool, Type)
         end
     end
 end
+functions.Mode = function(self,params)
+if ingame() then
+local DiffTable = {
+        ["Easy"] = "Easy",
+        ["Casual"] = "Casual",
+        ["Intermediate"] = "Intermediate",
+        ["Molten"] = "Molten",
+        ["Fallen"] = "Fallen"
+    }
+    local ModeName = DiffTable[params.Name] or params.Name
+local HasDifficultyVotedGUI =  game:GetService("Players").LocalPlayer.PlayerGui:WaitForChild("ReactGameDifficulty"):WaitForChild("Frame"):WaitForChild("buttons")
+if game:GetService("ReplicatedStorage").State.Difficulty == ModeName then
+return true
+		else
+repeat task.wait() until HasDifficultyVotedGUI
+local args = {
+    [1] = "Difficulty",
+    [2] = "Vote",
+    [3] = ModeName
+}
 
+game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+task.wait(1)
+local args = {
+    [1] = "Difficulty",
+    [2] = "Ready"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+
+	
+end
 --------------------------------------------------------------------------------
 -- Place function
 --------------------------------------------------------------------------------
