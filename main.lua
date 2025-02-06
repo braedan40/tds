@@ -251,7 +251,6 @@ functions.Loadout(self, p1)
                 end
             end
         end
-	end
     end)
 --------------------------------------------------------------------------------
 -- Example usage for "Loadout" (commented-out demonstration)
