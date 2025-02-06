@@ -89,7 +89,7 @@ functions.Loadout = function(self, p1)
     local LoadoutProps = self.Loadout
     local AllowEquip = tableinfo["AllowEquip"] or false
     local SkipCheck = tableinfo["SkipCheck"] or false
-    LoadoutProps.AllowTeleport = type(LoadoutProps.AllowTeleport) == "boolean" and LoadoutProps.AllowTeleport or false
+    --LoadoutProps.AllowTeleport = type(LoadoutProps.AllowTeleport) == "boolean" and LoadoutProps.AllowTeleport or false
     local TroopsOwned = GetTowersInfo()
     for i,v in next, LoadoutProps do
         if string.find(typeof(v):lower(),"thread") then
