@@ -534,7 +534,7 @@ end
 -- Upgrade function
 --------------------------------------------------------------------------------
 functions.Upgrade = function(self, params)
-    local Tower = params["TowerName"]
+    local Tower = params["TowerIndex"]
     local Wave, Min, Sec, InWave = params["Wave"] or 0, params["Minute"] or 0, params["Second"] or 0, params["InBetween"] or false
 
     -- Wait for wave timer
