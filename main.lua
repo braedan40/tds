@@ -4,7 +4,6 @@ local dynamicKey = "DynamicKey_Generated_or_Fetched"
 if not dynamicKey then
 error("Failed to retrieve dynamic key.")
 end
-
 return dynamicKey
 end
 local function invokeRemote(args)
@@ -160,6 +159,9 @@ RemoteFunction:InvokeServer(unpack(args))
 end
 
 functions.Place = function(self, params)
+    if not isGame() then
+        return
+    end
 if not isGame then
 warn("isGame function is not defined.")
 return
@@ -168,10 +170,23 @@ if not isGame() then
 return
 end
 
+    local Tower = params["TowerName"]
+    local Position = params["Position"] or Vector3.new(0, 0, 0)
+    local Rotation = params["Rotation"] or CFrame.new(0, 0, 0)
+    repeat task.wait() until waitForWaveTimer(params["Wave"], params["Timer"])
+    PlaceNameradd += 1 
+    local placementResult
+    repeat
+        placementResult = game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"):InvokeServer("Troops", "Pl\208\176ce", {
+            ["Position"] = Position,
+            ["Rotation"] = Rotation
+        }, Tower)
+    until typeof(placementResult) == "Instance"
+    
+    placementResult.Name = PlaceNameradd --placementResult.Name = placementResult.Name .. "1"
 local Tower = params["TowerName"]
 local Position = params["Position"] or Vector3.new(0, 0, 0)
 local Rotation = params["Rotation"] or CFrame.new(0, 0, 0)
-
 if not waitForWaveTimer then
 warn("waitForWaveTimer function is not defined.")
 return
@@ -179,9 +194,7 @@ end
 repeat
 task.wait()
 until waitForWaveTimer(params["Wave"], params["Timer"])
-
-PlaceNameradd = (PlaceNameradd or 0) + 1
-
+PlaceNameradd += 1
 local placementResult
 repeat
 placementResult = invokeRemote({
@@ -194,7 +207,6 @@ placementResult = invokeRemote({
 Tower
 })
 until typeof(placementResult) == "Instance"
-
 if placementResult then
 placementResult.Name = PlaceNameradd
 else
@@ -205,16 +217,13 @@ end
 
 --[[functions.Select = function(Tower)
 local towerInstance = workspace:FindFirstChild("Towers") and workspace.Towers:FindFirstChild(Tower)
-
 if towerInstance then
-
 local args = {
     [1] = "Streaming",
     [2] = "SelectTower", 
     [3] = "Set", -- name of tower
     [4] = { } -- name of skiin
 }
-
 game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
  end
 end]]
@@ -244,7 +253,7 @@ end
 functions.Sell = function(Tower)
     local towerInstance = workspace:FindFirstChild("Towers") and workspace.Towers:FindFirstChild(Tower)
     if towerInstance then
-    
+
 local args = {
     [1] = "Troops",
     [2] = "Sell",
