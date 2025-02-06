@@ -139,8 +139,8 @@ function GetTowersInfo()
 end
 
 -- Primary loadout function
-functions.Loadout = function(self, p1)
-    local tableinfo = p1
+functions.Loadout = function(self, params)
+    --[[local tableinfo = params
     local TotalTowers = tableinfo
     local GoldenTowers = tableinfo["Golden"] or {}
   -- Instead of 'LoadoutProps = self.Loadout', do:
@@ -249,7 +249,7 @@ local LoadoutProps = self.LoadoutProps
                 end
             end
         end
-    end)
+    end)]]
 end
 
 --------------------------------------------------------------------------------
