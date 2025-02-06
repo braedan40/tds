@@ -1,0 +1,111 @@
+local lib = loadstring(game:HttpGet"https://raw.githubusercontent.com/dawid-scripts/UI-Libs/main/Vape.txt")()
+
+local win = lib:Window("PREVIEW",Color3.fromRGB(44, 120, 224), Enum.KeyCode.RightControl)
+
+local tab = win:Tab("Tab 1")
+local powerups = {} 
+for _,v in pairs(game:GetService("ReplicatedStorage").Rotu_ReplicatedStorage.PowerDrops:GetChildren()) do table.insert(powerups,v.Name) end
+tab:Dropdown("Powerups",powerups, function(t)
+getgenv().powerupsselected = t
+end)
+tab:Button("GivePowerups", function()
+if not getgenv().powerupsselected == "InstaKill" or not getgenv().powerupsselected == "MaxAmmo" or not getgenv().powerupsselected == "DoublePoints" then
+local args = {
+    [1] = getgenv().powerupsselected
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Rotu_ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("PowerDrops"):FireServer(unpack(args))
+else
+  local args = {
+    [1] = getgenv().powerupsselected,
+    [2] = true
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Rotu_ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("PowerDrops"):FireServer(unpack(args))
+end
+end)
+tab:Button("Go back lobby", function()
+  game:GetService("ReplicatedStorage"):WaitForChild("Rotu_ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("GetBack"):FireServer()
+end)
+
+tab:Dropdown("Modify Gun",{"Auto","Ammo","FireRate","Damage"}, function(t)
+getgenv().ModifyGunSelected = t
+end)
+tab:Toggle("Automatic mod gun", false, function(t)
+    getgenv().AutomaticModGun = t
+    if getgenv().AutomaticModGun then
+        coroutine.wrap(function()
+            while getgenv().AutomaticModGun do
+                task.wait(0.1)  -- Slight delay to reduce performance load
+                
+                local player = game:GetService("Players").LocalPlayer
+                local tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
+                
+                if tool and tool:FindFirstChild("Config") then
+                    local success, modifygun = pcall(require, tool.Config)
+                    
+                    if success and modifygun then
+                        if getgenv().ModifyGunSelected == "Auto" then
+                            modifygun["Auto"] = true
+                        elseif getgenv().ModifyGunSelected == "Ammo" then
+                            modifygun["MagSize"] = math.huge
+                            modifygun["LoadSize"] = math.huge
+                       elseif getgenv().ModifyGunSelected == "FireRate" then
+                           modifygun["Firerate"] = math.huge
+                       elseif getgenv().ModifyGunSelected == "Damage" then
+                           modifygun["Damage"] = math.huge
+                        end
+                    end
+                end
+            end
+        end)()
+    end
+end)
+
+
+tab:Toggle("Kill all zombie", false, function(t)
+    getgenv().killallzombies = t
+    if getgenv().killallzombies then
+        coroutine.wrap(function()
+            while getgenv().killallzombies do
+                task.wait()
+if game:GetService("Players").LocalPlayer.Character:FindFirstChildWhichIsA("Tool") then
+   for i,v in pairs(game:GetService("Workspace")["Zombie Spawn"]:GetChildren()) do
+local args = {
+    [1] = v:FindFirstChild("Humanoid"),
+    [2] = v:FindFirstChild("Head")
+}
+
+game:GetService("Players").LocalPlayer.Character:FindFirstChildWhichIsA("Tool") .VerifyHit:FireServer(unpack(args))
+end
+end
+            end
+        end)()
+    end
+end)
+
+--[[tab:Slider("Slider",0,100,30, function(t)
+print(t)
+end)]]
+
+
+
+tab:Colorpicker("Colorpicker",Color3.fromRGB(255,0,0), function(t)
+print(t)
+end)
+
+--[[tab:Textbox("Textbox",true, function(t)
+print(t)
+end)
+
+tab:Bind("Bind",Enum.KeyCode.RightShift, function()
+print("Pressed!")
+end)
+
+tab:Label("Label")
+
+local changeclr = win:Tab("Change UI Color")
+
+changeclr:Colorpicker("Change UI Color",Color3.fromRGB(44, 120, 224), function(t)
+lib:ChangePresetColor(Color3.fromRGB(t.R * 255, t.G * 255, t.B * 255))
+end)]]
