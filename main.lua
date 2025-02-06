@@ -115,7 +115,7 @@ function waitwavetimer(Wave, Min, Sec, InWave)
         game:GetService("RunService").Heartbeat:Wait(TimerWait(Sec))
         return true
     end
-    return true
+   -- return true
 end
 
 --------------------------------------------------------------------------------
@@ -433,7 +433,7 @@ local args = {
 
 game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
 
-	
+		end
 end
 --------------------------------------------------------------------------------
 -- Place function
@@ -450,6 +450,9 @@ functions.Place = function(self, params)
     end
     
     local Tower = params["TowerName"]
+    local Position = params["Position"] or Vector3.new(0, 0, 0)
+    local Rotation = params["Rotation"] or CFrame.new(0, 0, 0)
+    local Wave, Min, Sec, InWave = params["Wave"] or 0, params["Minute"] or 0, params["Second"] or 0, params["InBetween"] or false
     if not game:GetService("ReplicatedStorage").Assets.Troops:FindFirstChild(Tower) then
 				local args = {
     [1] = "Streaming",
@@ -460,11 +463,7 @@ functions.Place = function(self, params)
 
 game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
 repeat task.wait() until game:GetService("ReplicatedStorage").Assets.Troops:FindFirstChild(Tower)
-			end
-    local Position = params["Position"] or Vector3.new(0, 0, 0)
-    local Rotation = params["Rotation"] or CFrame.new(0, 0, 0)
-    local Wave, Min, Sec, InWave = params["Wave"] or 0, params["Minute"] or 0, params["Second"] or 0, params["InBetween"] or false
-
+end
     -- Wait for wave timer
     repeat task.wait() until waitwavetimer(Wave, Min, Sec, InWave)
 
@@ -589,8 +588,6 @@ functions.Skip = function(self, params)
     }
     game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
 end
+end
 
---------------------------------------------------------------------------------
--- Return the table containing all functions
---------------------------------------------------------------------------------
 return functions 
