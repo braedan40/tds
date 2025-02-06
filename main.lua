@@ -448,8 +448,19 @@ functions.Place = function(self, params)
         warn("Not in game, cannot place tower.")
         return
     end
-
+    
     local Tower = params["TowerName"]
+    if not game:GetService("ReplicatedStorage").Assets.Troops:FindFirstChild(Tower) then
+				local args = {
+    [1] = "Streaming",
+    [2] = "SelectTower",
+    [3] = Tower,
+    [4] = "Default"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+repeat task.wait() until game:GetService("ReplicatedStorage").Assets.Troops:FindFirstChild(Tower)
+			end
     local Position = params["Position"] or Vector3.new(0, 0, 0)
     local Rotation = params["Rotation"] or CFrame.new(0, 0, 0)
     local Wave, Min, Sec, InWave = params["Wave"] or 0, params["Minute"] or 0, params["Second"] or 0, params["InBetween"] or false
