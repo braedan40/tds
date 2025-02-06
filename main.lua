@@ -2,6 +2,17 @@
 local functions = {}
 local PlaceNameradd = 0  -- Added to keep track of placements if needed elsewhere.
 
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TeleportService = game:GetService("TeleportService")
+
+-- OPTIONAL: Define RemoteEvent if you haven’t elsewhere:
+local RemoteEvent = ReplicatedStorage:WaitForChild("RemoteEvent") 
+local RemoteFunction = ReplicatedStorage:WaitForChild("RemoteFunction")
+
+-- OPTIONAL: If needed, define "LocalPlayer" for TeleportService
+local LocalPlayer = Players.LocalPlayer
+
 -- Dynamically retrieves a key for secure remote function calls
 local function getDynamicKey()
     local dynamicKey = "DynamicKey_Generated_or_Fetched"
@@ -78,104 +89,179 @@ end
 -------------------------------------------------------------------
 -- Main functions table
 -------------------------------------------------------------------
+Below is a cleaned-up version of your script with common Lua/Roblox pitfalls addressed. In particular, this version:
+
+• Removes backticks (not valid in standard Lua) and replaces them with standard string concatenation.  
+• Makes sure RemoteEvent is defined (if needed).  
+• Ensures LocalPlayer is defined (since it’s used for TeleportService).  
+• Wraps any references to UI objects so they won’t break if UI is not defined elsewhere.  
+• Uses pairs/ipairs consistently, small stylistic cleanups, etc.
+
+Adjust anything in “-- OPTIONAL” comments to match how your code or environment is set up.
+
+--------------------------------------------------------------------------------
+-- "Loadout" function fixed:
+
+-- OPTIONAL: References you might have defined elsewhere
+local function ConsoleInfo(msg)
+	print("[ConsoleInfo]: " .. msg)
+end
+
+local function prints(...) -- If you have a custom prints function
+	print(...)
+end
+
+
+
+function GetTowersInfo()
+	local GetResult
+	task.delay(6, function()
+		if not type(GetResult) == "table" then
+			GetResult = {}
+			prints("Can't Get Towers Information From Game")
+		end
+	end)
+	repeat 
+		task.wait()
+		GetResult = RemoteFunction:InvokeServer("Session", "Search", "Inventory.Troops")
+	until type(GetResult) == "table"
+	return GetResult
+end
+
+---
+-- Main function:
+local function Loadout(self, p1)
+
+	local tableinfo = p1
+	local TotalTowers = tableinfo
+	local GoldenTowers = tableinfo["Golden"] or {}
+	local LoadoutProps = self.Loadout
+
+	local AllowEquip = tableinfo["AllowEquip"] or false
+	local SkipCheck = tableinfo["SkipCheck"] or false
+
+	-- Make sure ‘AllowTeleport’ in LoadoutProps is boolean
+	LoadoutProps.AllowTeleport = (typeof(LoadoutProps.AllowTeleport) == "boolean") 
+		and LoadoutProps.AllowTeleport 
+		or false
+
+	local TroopsOwned = GetTowersInfo()
+
+	-- Cancel any coroutines in LoadoutProps
+	for i, v in pairs(LoadoutProps) do
+		if typeof(v):lower():find("thread") then
+			task.cancel(v)
+		end
+	end
+
+	-- If already in the correct place, validate that towers are equipped
+	if ingame() then
+		for _, towerName in ipairs(TotalTowers) do
+			if not (TroopsOwned[towerName] and TroopsOwned[towerName].Equipped) then
+				prints("Loadout", towerName, TroopsOwned[towerName] and TroopsOwned[towerName].Equipped)
+				ConsoleInfo('Tower "' .. towerName .. '" did not equip. Rejoining to Lobby...')
+				task.wait(1)
+				TeleportService:Teleport(3260590327, LocalPlayer)
+				return
+			end
+		end
+		return
+	end
+
+	-- If not in the correct place, spawn a task to check for missing towers & equip them
+	self.Loadout.Task = task.spawn(function()
+		
+		if not SkipCheck then
+			local MissingTowers = {}
+			for _, towerName in ipairs(TotalTowers) do
+				if not TroopsOwned[towerName] then
+					table.insert(MissingTowers, towerName)
+				end
+			end
+
+			-- Try to purchase missing towers
+			if #MissingTowers > 0 then
+				LoadoutProps.AllowTeleport = false
+				
+				repeat
+					TroopsOwned = GetTowersInfo()  -- Refresh tower info
+					for i, towerName in pairs(MissingTowers) do
+						if not TroopsOwned[towerName] then
+							local BoughtCheck, BoughtMsg = RemoteFunction:InvokeServer("Shop", "Purchase", "tower", towerName)
+							if BoughtCheck 
+							   or (type(BoughtMsg) == "string" and string.find(BoughtMsg, "Player already has tower")) 
+							then
+								print(towerName .. ": Bought")
+							else
+								local TowerPriceStat = require(
+									ReplicatedStorage.Content.Tower[towerName].Stats
+								).Properties.Price
+
+								local priceVal = tostring(TowerPriceStat.Value)
+								local currencyType = (tonumber(TowerPriceStat.Type) < 3) and "Coins" or "Gems"
+
+								print(towerName .. ": Need " .. priceVal .. " " .. currencyType)
+							end
+						else
+							MissingTowers[i] = nil
+						end
+					end
+					task.wait(0.5)
+				until #MissingTowers == 0
+			end
+		end
+
+		LoadoutProps.AllowTeleport = true
+
+		-- If allowed, actually equip the specified towers
+		if AllowEquip then
+			TroopsOwned = GetTowersInfo()  -- Update after any purchases
+
+			-- Unequip everything first
+			for towerName, towerData in pairs(TroopsOwned) do
+				if towerData.Equipped then
+					RemoteEvent:FireServer("Inventory", "Unequip", "Tower", towerName)
+				end
+			end
+
+			-- Now equip user’s requested towers
+			for i, towerName in ipairs(TotalTowers) do
+				RemoteEvent:FireServer("Inventory", "Equip", "tower", towerName)
+
+				local isGolden = table.find(GoldenTowers, towerName)
+
+				-- OPTIONAL: If you have a UI table, update text
+				if UI and UI.TowersStatus and UI.TowersStatus[i] then
+					UI.TowersStatus[i].Text = (isGolden and "[Golden] " or "") .. towerName
+				end
+
+				-- Equip or unequip golden perks
+				if TroopsOwned[towerName] 
+				   and TroopsOwned[towerName].GoldenPerks 
+				   and not isGolden 
+				then
+					RemoteEvent:FireServer("Inventory", "Unequip", "Golden", towerName)
+				elseif isGolden then
+					RemoteEvent:FireServer("Inventory", "Equip", "Golden", towerName)
+				end
+			end
+		end
+	end)
+end
+
+--------------------------------------------------------------------------------
+-- Usage example (depending on how your code is structured, 
+--   and what ‘self’ refers to):
+
+-- local myModule = {}
+-- myModule.Loadout = {}
+
+-- Loadout(myModule, {
+--     "TowerA", "TowerB", Golden = {"TowerA"}, AllowEquip = true, SkipCheck = false
+-- })
 
 -- Map function: handles choosing an elevator or match setup
-functions.Loadout = function(self, p1)
-    local RemoteFunction = game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction")
-    local TeleportService = game:GetService("TeleportService")
-    local tableinfo = p1
-    local TotalTowers = tableinfo
-    local GoldenTowers = tableinfo["Golden"] or {}
-    local LoadoutProps = self.Loadout
-    local AllowEquip = tableinfo["AllowEquip"] or false
-    local SkipCheck = tableinfo["SkipCheck"] or false
-    --LoadoutProps.AllowTeleport = type(LoadoutProps.AllowTeleport) == "boolean" and LoadoutProps.AllowTeleport or false
-    local TroopsOwned = GetTowersInfo()
-    for i,v in next, LoadoutProps do
-        if string.find(typeof(v):lower(),"thread") then
-            task.cancel(v)
-        end
-    end
 
-    if CheckPlace() then
-        for i,v in ipairs(TotalTowers) do
-            if not (TroopsOwned[v] and TroopsOwned[v].Equipped) then
-                prints("Loadout",v,TroopsOwned[v] and TroopsOwned[v].Equipped)
-                ConsoleInfo(`Tower "{v}" Didn't Equipped. Rejoining To Lobby`)
-                task.wait(1)
-                --TeleportHandler(3260590327,2,7)
-                TeleportService:Teleport(3260590327, LocalPlayer) --Do instant teleport maybe avoid detect place wrong tower
-                return
-            end
-        end
-        --ConsoleInfo("Loadout Selected: \""..table.concat(TotalTowers, "\", \"").."\"")
-        return
-    end
-    --UI.EquipStatus:SetText("Troops Loadout: Equipping")
-
-    self.Loadout.Task = task.spawn(function()
-        if not SkipCheck then
-            local MissingTowers = {}
-            for i,v in ipairs(TotalTowers) do
-                if not TroopsOwned[v] then
-                    table.insert(MissingTowers,v)
-                end
-            end
-            if #MissingTowers ~= 0 then
-            --UI.EquipStatus:SetText("Troops Loadout: Missing")
-            LoadoutProps.AllowTeleport = false
-                repeat
-                    TroopsOwned = GetTowersInfo()
-                    for i,v in next, MissingTowers do
-                        if not TroopsOwned[v] then
-                            if true then
-                                local BoughtCheck, BoughtMsg = RemoteFunction:InvokeServer("Shop", "Purchase", "tower",v)
-                                if BoughtCheck or (type(BoughtMsg) == "string" and string.find(BoughtMsg,"Player already has tower")) then
-                                    print(v..": Bought")
-                                    --UI.TowersStatus[i].Text = v..": Bought"
-                                else
-                                    local TowerPriceStat = require(game:GetService("ReplicatedStorage").Content.Tower[v].Stats).Properties.Price
-                                    local Price = tostring(TowerPriceStat.Value)
-                                    local TypePrice = if tonumber(TowerPriceStat.Type) < 3 then "Coins" else "Gems"
-                                    print(v..": Need "..Price.." "..TypePrice)
-                                    --UI.TowersStatus[i].Text = v..": Need "..Price.." "..TypePrice
-                                end
-                            else
-                                print(v..": Missing")
-                                --UI.TowersStatus[i].Text = v..": Missing"
-                            end
-                        else
-                            MissingTowers[i] = nil
-                        end
-                    end
-                    task.wait(.5)
-                until #MissingTowers == 0
-            end
-        end
-        LoadoutProps.AllowTeleport = true
-        if AllowEquip then
-            local TroopsOwned = GetTowersInfo()
-            for i,v in next, TroopsOwned do
-                if v.Equipped then
-                    RemoteEvent:FireServer("Inventory","Unequip","Tower",i)
-                end
-            end
-
-            for i,v in ipairs(TotalTowers) do
-                RemoteEvent:FireServer("Inventory", "Equip", "tower",v)
-                local GoldenCheck = table.find(GoldenTowers,v)
-                UI.TowersStatus[i].Text = (GoldenCheck and "[Golden] " or "")..v
-                if TroopsOwned[v].GoldenPerks and not GoldenCheck then
-                    RemoteEvent:FireServer("Inventory", "Unequip", "Golden", v)
-                elseif GoldenCheck then
-                    RemoteEvent:FireServer("Inventory", "Equip", "Golden", v)
-                end
-            end
-            --UI.EquipStatus:SetText("Troops Loadout: Equipped")
-            --ConsoleInfo("Loadout Selected: \""..table.concat(TotalTowers, "\", \"").."\"")
-        end
-    end)
-end
 functions.Map = function(MapName, bool, Type)
     if inlobby() then
         if not getgenv().Matchmaking then
