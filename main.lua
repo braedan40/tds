@@ -194,7 +194,9 @@ end
     local Tower = params["TowerName"]
     local Position = params["Position"] or Vector3.new(0, 0, 0)
     local Rotation = params["Rotation"] or CFrame.new(0, 0, 0)
-    repeat task.wait() until waitForWaveTimer(params["Wave"], params["Timer"])
+    local Wave,Min,Sec,InWave = params["Wave"] or 0, params["Minute"] or 0, params["Second"] or 0, params["InBetween"] or false
+    repeat task.wait() until waitForWaveTimer(Wave, Min,Sec)
+		
     PlaceNameradd += 1 
     local placementResult
     repeat
