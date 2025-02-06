@@ -252,16 +252,19 @@ game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvent"):FireServer(unpa
 end]]
 
 
-functions.Upgrade = function(Tower,wave,Timer)
-    local towerInstance = workspace:FindFirstChild("Towers") and workspace.Towers:FindFirstChild(Tower)
-    repeat task.wait() until waitwavetimer(wave,Timer)
+functions.Upgrade = function(self,Params)
+     local Tower = params["TowerName"]
+    local Position = params["Position"] or Vector3.new(0, 0, 0)
+    local Rotation = params["Rotation"] or CFrame.new(0, 0, 0)
+    local Wave,Min,Sec,InWave = params["Wave"] or 0, params["Minute"] or 0, params["Second"] or 0, params["InBetween"] or false
+    repeat task.wait() until waitwavetimer(wave,Min,Sec)
     if towerInstance then
         local args = {
             [1] = "Troops",
             [2] = "Upgrade",
             [3] = "Set",
             [4] = {
-                ["Troop"] = towerInstance,
+                ["Troop"] = game:GetService("Workspace').Towers.:FindFirstChild(Tower),
                 ["Path"] = 1
             }
         }
