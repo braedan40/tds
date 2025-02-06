@@ -80,7 +80,7 @@ end
 -------------------------------------------------------------------
 
 -- Map function: handles choosing an elevator or match setup
-functiions.Loadout = function(self, p1)
+functions.Loadout = function(self, p1)
     local RemoteFunction = game:GetService("ReplicatedStorage"):WaitForChild("RemoteFunction")
     local TeleportService = game:GetService("TeleportService")
     local tableinfo = p1
