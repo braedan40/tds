@@ -8,7 +8,14 @@ local PlaceNameradd = 0  -- Added to keep track of placements if needed elsewher
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TeleportService = game:GetService("TeleportService")
-
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local PathfindingService = game:GetService("PathfindingService")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local rootPart = character:WaitForChild("HumanoidRootPart")
 -- OPTIONAL: Define RemoteEvent if you haven’t elsewhere:
 local RemoteEvent = ReplicatedStorage:WaitForChild("RemoteEvent") 
 local RemoteFunction = ReplicatedStorage:WaitForChild("RemoteFunction")
@@ -27,7 +34,23 @@ end
 local function prints(...)
 	print(...)
 end
+local function moveTo(target)
+    local path = PathfindingService:CreatePath()
+    path:ComputeAsync(rootPart.Position, target.Position)
 
+    if path.Status == Enum.PathStatus.Success then
+        local waypoints = path:GetWaypoints()
+        for _, waypoint in ipairs(waypoints) do
+            humanoid:MoveTo(waypoint.Position)
+            humanoid.MoveToFinished:Wait()
+            if waypoint.Action == Enum.PathWaypointAction.Jump then
+                humanoid.Jump = true
+            end
+        end
+    else
+        warn("Path not found or obstructed.")
+    end
+end
 --------------------------------------------------------------------------------
 -- Dynamically retrieves a key for secure remote function calls
 --------------------------------------------------------------------------------
