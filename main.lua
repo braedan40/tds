@@ -1,11 +1,13 @@
 --------------------------------------------------------------------------------
 -- Module: functions.lua
 --------------------------------------------------------------------------------
+
 local functions = {}
 
 --------------------------------------------------------------------------------
 -- Services & Local Variables
 --------------------------------------------------------------------------------
+
 local PlaceNameradd = 0  -- Tracks placements if needed elsewhere
 
 local Players = game:GetService("Players")
@@ -26,6 +28,7 @@ local RemoteFunction = ReplicatedStorage:WaitForChild("RemoteFunction")
 --------------------------------------------------------------------------------
 -- Example Logging Functions
 --------------------------------------------------------------------------------
+
 local function ConsoleInfo(msg)
 	print("[ConsoleInfo]: " .. msg)
 end
@@ -37,10 +40,10 @@ end
 --------------------------------------------------------------------------------
 -- Move Character Using Pathfinding
 --------------------------------------------------------------------------------
+
 local function moveTo(target)
     local path = PathfindingService:CreatePath()
     path:ComputeAsync(rootPart.Position, target.Position)
-
     if path.Status == Enum.PathStatus.Success then
         local waypoints = path:GetWaypoints()
         for _, waypoint in ipairs(waypoints) do
@@ -58,6 +61,7 @@ end
 --------------------------------------------------------------------------------
 -- Check if in Lobby or In-Game
 --------------------------------------------------------------------------------
+
 function inlobby()
     return game.PlaceId == 3260590327 
         or (
@@ -77,6 +81,7 @@ end
 --------------------------------------------------------------------------------
 -- Timer Utility
 --------------------------------------------------------------------------------
+
 function TimerWait(Number)
     -- Returns a fractional wait offset
     return (Number - math.floor(Number) - 0.13) + 0.5
@@ -111,30 +116,36 @@ end
 --------------------------------------------------------------------------------
 -- Towers / Inventory Info
 --------------------------------------------------------------------------------
+
 local function GetTowersInfo()
     local GetResult
+
+    -- If it fails to get towers after 6 seconds, just return an empty table.
     task.delay(6, function()
-        if not type(GetResult) == "table" then
+        if type(GetResult) ~= "table" then
             GetResult = {}
             prints("Can't Get Towers Information From Game")
         end
     end)
+
     repeat 
         task.wait()
         GetResult = RemoteFunction:InvokeServer("Session", "Search", "Inventory.Troops")
     until type(GetResult) == "table"
+
     return GetResult
 end
 
 --------------------------------------------------------------------------------
 -- Loadout Function
 --------------------------------------------------------------------------------
+
 functions.Loadout = function(self, params)
-    -- Example usage of parameters
     local TotalTowers = params
     local GoldenTowers = params["Golden"] or {}
     local AllowEquip = params["AllowEquip"] or false
     local SkipCheck = params["SkipCheck"] or false
+
     local TroopsOwned = GetTowersInfo()
 
     -- If we’re already in the game place, validate that towers are equipped
@@ -142,7 +153,7 @@ functions.Loadout = function(self, params)
         for _, towerName in ipairs(TotalTowers) do
             if not (TroopsOwned[towerName] and TroopsOwned[towerName].Equipped) then
                 prints("Loadout", towerName, TroopsOwned[towerName] and TroopsOwned[towerName].Equipped)
-                ConsoleInfo("Tower \"" .. towerName .. "\" did not equip. Rejoining to Lobby.")
+                ConsoleInfo('Tower "' .. towerName .. '" did not equip. Rejoining to Lobby.')
                 task.wait(1)
                 TeleportService:Teleport(3260590327, player)
                 return
@@ -151,7 +162,7 @@ functions.Loadout = function(self, params)
         return
     end
 
-    -- If not in game, spawn a task to check for missing towers & equip them
+    -- If not in game, check for missing towers & optionally equip
     task.spawn(function()
         if not SkipCheck then
             local MissingTowers = {}
@@ -160,6 +171,7 @@ functions.Loadout = function(self, params)
                     table.insert(MissingTowers, towerName)
                 end
             end
+
             if #MissingTowers > 0 then
                 repeat
                     TroopsOwned = GetTowersInfo()
@@ -174,7 +186,6 @@ functions.Loadout = function(self, params)
                                 local TowerPriceStat = require(ReplicatedStorage.Content.Tower[towerName].Stats).Properties.Price
                                 local priceVal = tostring(TowerPriceStat.Value)
                                 local currencyType = (tonumber(TowerPriceStat.Type) < 3) and "Coins" or "Gems"
-
                                 print(towerName .. ": Need " .. priceVal .. " " .. currencyType)
                             end
                         else
@@ -186,7 +197,6 @@ functions.Loadout = function(self, params)
             end
         end
 
-        -- If allowed, equip the specified towers
         if AllowEquip then
             TroopsOwned = GetTowersInfo()
 
@@ -200,16 +210,12 @@ functions.Loadout = function(self, params)
             -- Now equip user’s requested towers
             for i, towerName in ipairs(TotalTowers) do
                 RemoteEvent:FireServer("Inventory", "Equip", "tower", towerName)
-
                 local isGolden = table.find(GoldenTowers, towerName)
-                -- If you have a UI, you could do:
-                -- if UI and UI.TowersStatus and UI.TowersStatus[i] then
-                --     UI.TowersStatus[i].Text = (isGolden and "[Golden] " or "") .. towerName
-                -- end
 
                 if TroopsOwned[towerName] 
                    and TroopsOwned[towerName].GoldenPerks 
-                   and not isGolden then
+                   and not isGolden 
+                then
                     RemoteEvent:FireServer("Inventory", "Unequip", "Golden", towerName)
                 elseif isGolden then
                     RemoteEvent:FireServer("Inventory", "Equip", "Golden", towerName)
@@ -222,6 +228,7 @@ end
 --------------------------------------------------------------------------------
 -- Map Function
 --------------------------------------------------------------------------------
+
 functions.Map = function(MapName, bool, Type)
     if inlobby() then
         if not getgenv().Matchmaking then
@@ -240,7 +247,6 @@ functions.Map = function(MapName, bool, Type)
                     elseif playerCount > 2 then
                         player.Character.HumanoidRootPart.CFrame =
                             player.Character.HumanoidRootPart.CFrame * CFrame.new(15, 6, 23.2)
-
                         ReplicatedStorage
                             :WaitForChild("Network")
                             :WaitForChild("Elevators")
@@ -253,7 +259,6 @@ functions.Map = function(MapName, bool, Type)
                 for _, elevator in pairs(workspace.Elevators:GetChildren()) do
                     local elevatorMap = elevator:GetAttribute("Map")
                     local playerCount = elevator:GetAttribute("Players")
-
                     if table.find(MapName, elevatorMap) and playerCount < 1 then
                         ReplicatedStorage
                             :WaitForChild("Network")
@@ -268,7 +273,6 @@ functions.Map = function(MapName, bool, Type)
                             :InvokeServer()
                     end
                 end
-            end
 
         -------------------------------------------------------------------
         -- Matchmaking
@@ -277,8 +281,6 @@ functions.Map = function(MapName, bool, Type)
             if inlobby() then
                 local RemoteFunction = ReplicatedStorage:WaitForChild("RemoteFunction")
                 RemoteFunction:InvokeServer("Multiplayer", "single_create")
-
-                -- “mode” here must be defined if you actually need it:
                 local args = {
                     [1] = "Multiplayer",
                     [2] = "v2:start",
@@ -294,6 +296,7 @@ functions.Map = function(MapName, bool, Type)
                 for _ = 1, 4 do
                     -- Possibly do something in the match
                 end
+
                 repeat
                     game:GetService("RunService").Heartbeat:Wait()
                 until workspace:FindFirstChild("IntermissionLobby")
@@ -327,7 +330,6 @@ functions.Map = function(MapName, bool, Type)
                         else
                             local RemoteFunction = ReplicatedStorage:WaitForChild("RemoteFunction")
                             RemoteFunction:InvokeServer("Multiplayer", "single_create")
-
                             local retryArgs = {
                                 [1] = "Multiplayer",
                                 [2] = "v2:start",
@@ -343,7 +345,6 @@ functions.Map = function(MapName, bool, Type)
                 end
             end
         end
-
     elseif ingame() then
         -- If already in game, check the map
         if ReplicatedStorage:FindFirstChild("State") and ReplicatedStorage.State.Map == MapName then
@@ -355,6 +356,7 @@ end
 --------------------------------------------------------------------------------
 -- Mode Function
 --------------------------------------------------------------------------------
+
 functions.Mode = function(self, params)
     if ingame() then
         local DiffTable = {
@@ -364,8 +366,8 @@ functions.Mode = function(self, params)
             ["Molten"] = "Molten",
             ["Fallen"] = "Fallen"
         }
-        local ModeName = DiffTable[params.Name] or params.Name
 
+        local ModeName = DiffTable[params.Name] or params.Name
         local HasDifficultyVotedGUI = player.PlayerGui
             :WaitForChild("ReactGameDifficulty")
             :WaitForChild("Frame")
@@ -375,14 +377,15 @@ functions.Mode = function(self, params)
             return true
         else
             repeat task.wait() until HasDifficultyVotedGUI
+
             local argsVote = {
                 [1] = "Difficulty",
                 [2] = "Vote",
                 [3] = ModeName
             }
             ReplicatedStorage:WaitForChild("RemoteFunction"):InvokeServer(unpack(argsVote))
-
             task.wait(1)
+
             local argsReady = {
                 [1] = "Difficulty",
                 [2] = "Ready"
@@ -395,6 +398,7 @@ end
 --------------------------------------------------------------------------------
 -- Place Function
 --------------------------------------------------------------------------------
+
 functions.Place = function(self, params)
     if not ingame() then
         warn("Not in game, cannot place tower.")
@@ -406,7 +410,7 @@ functions.Place = function(self, params)
     local Rotation = params["Rotation"] or CFrame.new(0, 0, 0)
     local Wave, Min, Sec, InWave = params["Wave"] or 0, params["Minute"] or 0, params["Second"] or 0, params["InBetween"] or false
 
-    -- Make sure the tower is actually loaded in ReplicatedStorage (some scripts do dynamic loading)
+    -- Make sure the tower is actually streamed into ReplicatedStorage
     if not ReplicatedStorage.Assets.Troops:FindFirstChild(Tower) then
         local args = {
             [1] = "Streaming",
@@ -415,14 +419,15 @@ functions.Place = function(self, params)
             [4] = "Default"
         }
         ReplicatedStorage:WaitForChild("RemoteEvent"):FireServer(unpack(args))
+
         repeat 
             task.wait() 
         until ReplicatedStorage.Assets.Troops:FindFirstChild(Tower)
     end
 
+    -- Wait for the wave/timer condition
     repeat task.wait() until waitwavetimer(Wave, Min, Sec, InWave)
 
-    -- Instead of += 1, use standard Lua increment
     PlaceNameradd = PlaceNameradd + 1
 
     local placementResult
@@ -439,12 +444,14 @@ functions.Place = function(self, params)
         task.wait()
     until typeof(placementResult) == "Instance"
 
-    placementResult.Name = PlaceNameradd
+    -- Convert PlaceNameradd to a string in case naming with a number is problematic
+    placementResult.Name = tostring(PlaceNameradd)
 end
 
 --------------------------------------------------------------------------------
 -- Upgrade Function
 --------------------------------------------------------------------------------
+
 functions.Upgrade = function(self, params)
     local Tower = params["TowerIndex"]
     local Wave, Min, Sec, InWave = params["Wave"] or 0, params["Minute"] or 0, params["Second"] or 0, params["InBetween"] or false
@@ -466,6 +473,7 @@ end
 --------------------------------------------------------------------------------
 -- Sell Function
 --------------------------------------------------------------------------------
+
 functions.Sell = function(self, params)
     local Tower = params["TowerName"]
     local Wave, Min, Sec, InWave = params["Wave"] or 0, params["Minute"] or 0, params["Second"] or 0, params["InBetween"] or false
@@ -485,6 +493,7 @@ end
 --------------------------------------------------------------------------------
 -- Skill/Ability Function
 --------------------------------------------------------------------------------
+
 functions.Skill = function(self, params)
     local Tower = params["TowerName"]
     local AbilityName = params["AbilityName"] or "SkillName"
@@ -508,6 +517,7 @@ end
 --------------------------------------------------------------------------------
 -- Skip Function
 --------------------------------------------------------------------------------
+
 functions.Skip = function(self, params)
     local Wave, Min, Sec, InWave = params["Wave"] or 0, params["Minute"] or 0, params["Second"] or 0, params["InBetween"] or false
 
@@ -523,4 +533,5 @@ end
 --------------------------------------------------------------------------------
 -- Return the module
 --------------------------------------------------------------------------------
+
 return functions
